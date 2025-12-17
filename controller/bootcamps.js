@@ -1,10 +1,14 @@
-const Bootcamp = require("../model/Bootcamp");
+// Add depedencies
+
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const geocoder = require("../utils/geocoder");
 
+// Add resource model
+
+const Bootcamp = require("../model/Bootcamp");
+
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  console.log(req.query);
   let query;
   const reqQuery = { ...req.query };
   const keyArray = Object.keys(reqQuery);
@@ -29,7 +33,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   removedFields.forEach((item) => {
     delete reqQuery[item];
   });
-  console.log(reqQuery);
+
   query = Bootcamp.find(reqQuery);
 
   if (req.query.select) {
@@ -69,6 +73,10 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
       limit,
     };
   }
+
+  query = query.populate({
+    path: "courses",
+  });
 
   const bootcamps = await query;
   res.status(200).json({
@@ -119,13 +127,16 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 });
 
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
   if (!bootcamp) {
     next(
       new ErrorResponse(404, `Bootcamp not founded with id ${req.params.id}`)
     );
     return;
   }
+
+  await bootcamp.deleteOne();
+
   res.status(204).json({
     success: true,
     data: {},

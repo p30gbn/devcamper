@@ -1,4 +1,10 @@
+// Add depedencies
+
 const { Router } = require("express");
+const courseRouter = require("./courses");
+
+// Add controllers
+
 const {
   getBootcamps,
   createBootcamp,
@@ -7,7 +13,14 @@ const {
   deleteBootcamp,
   getBootcampInRadius,
 } = require("../controller/bootcamps");
+
+// Initialize router
+
 const router = Router();
+
+router.use("/:bootcampId/courses", courseRouter);
+
+// Add controllers to routes
 
 router.route("/").get(getBootcamps).post(createBootcamp);
 router
@@ -17,5 +30,7 @@ router
   .delete(deleteBootcamp);
 
 router.route("/radius/:zipcode/:distance").get(getBootcampInRadius);
+
+// Export router
 
 module.exports = router;
