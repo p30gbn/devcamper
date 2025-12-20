@@ -39,6 +39,29 @@ const courseSchema = new Schema({
   },
 });
 
+courseSchema.statics.calculateAverageCost = function (bootcampId) {
+  return this.aggregate([
+    {
+      $match: {
+        bootcamp: bootcampId,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        averageCost: {
+          $avg: "$cost",
+        },
+      },
+    },
+  ]);
+};
+
+courseSchema.post("save", async function () {
+  const averageCost = await Course.calculateAverageCost(this.bootcamp);
+  console.log(averageCost);
+});
+
 const Course = model("Course", courseSchema);
 
 module.exports = Course;
