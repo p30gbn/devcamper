@@ -123,8 +123,7 @@ bootcampSchema.pre("save", async function () {
   };
 });
 
-bootcampSchema.pre("deleteOne", async function () {
-  console.log("Cascade Deleting " + this._id);
+bootcampSchema.pre("deleteOne", { document: true }, async function () {
   await Course.deleteMany({
     bootcamp: this._id,
   });
